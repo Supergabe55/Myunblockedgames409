@@ -26,9 +26,15 @@ export const GamePlayer = ({
 
   // Extract src from iframe string if needed, or use embedUrl
   const getIframeSrc = () => {
-    if (game.embedUrl) return game.embedUrl;
-    const match = game.iframe?.match(/src=["']([^"']+)["']/);
-    return match ? match[1] : '';
+    let src = game.embedUrl;
+    if (!src && game.iframe) {
+      const match = game.iframe.match(/src=["']([^"']+)["']/);
+      src = match ? match[1] : '';
+    }
+    if (src && src.startsWith('/') && !src.startsWith('//')) {
+      src = '.' + src;
+    }
+    return src || '';
   };
 
   const iframeSrc = getIframeSrc();
@@ -77,7 +83,8 @@ export const GamePlayer = ({
     iframe.style.width = '100%';
     iframe.style.height = '100%';
     iframe.style.margin = '0';
-    iframe.src = window.location.origin + iframeSrc;
+    const resolvedUrl = new URL(iframeSrc, window.location.href).href;
+    iframe.src = resolvedUrl;
     iframe.allowFullscreen = true;
     win.document.body.appendChild(iframe);
   };

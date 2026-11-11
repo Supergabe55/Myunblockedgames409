@@ -11,8 +11,8 @@
     "featured": true,
     "icon": "Gamepad2",
     "accentColor": "#0ea5e9",
-    "embedUrl": "/games/snake.html",
-    "iframe": "<iframe src=\"/games/snake.html\" title=\"Snake Arcade\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/snake.html",
+    "iframe": "<iframe src=\"./games/snake.html\" title=\"Snake Arcade\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "tetra-blocks",
@@ -26,8 +26,8 @@
     "featured": true,
     "icon": "Boxes",
     "accentColor": "#8b5cf6",
-    "embedUrl": "/games/tetris.html",
-    "iframe": "<iframe src=\"/games/tetris.html\" title=\"Tetra Blocks\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/tetris.html",
+    "iframe": "<iframe src=\"./games/tetris.html\" title=\"Tetra Blocks\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "cyber-pong",
@@ -41,8 +41,8 @@
     "featured": false,
     "icon": "Activity",
     "accentColor": "#38bdf8",
-    "embedUrl": "/games/pong.html",
-    "iframe": "<iframe src=\"/games/pong.html\" title=\"Cyber Pong 1v1\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/pong.html",
+    "iframe": "<iframe src=\"./games/pong.html\" title=\"Cyber Pong 1v1\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "brick-breaker",
@@ -56,8 +56,8 @@
     "featured": false,
     "icon": "Layers",
     "accentColor": "#f97316",
-    "embedUrl": "/games/breakout.html",
-    "iframe": "<iframe src=\"/games/breakout.html\" title=\"Brick Breaker DX\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/breakout.html",
+    "iframe": "<iframe src=\"./games/breakout.html\" title=\"Brick Breaker DX\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "puzzle-2048",
@@ -71,8 +71,8 @@
     "featured": true,
     "icon": "Grid3X3",
     "accentColor": "#eab308",
-    "embedUrl": "/games/2048.html",
-    "iframe": "<iframe src=\"/games/2048.html\" title=\"2048 Classic\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/2048.html",
+    "iframe": "<iframe src=\"./games/2048.html\" title=\"2048 Classic\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "flappy-copter",
@@ -86,8 +86,8 @@
     "featured": false,
     "icon": "Flame",
     "accentColor": "#10b981",
-    "embedUrl": "/games/flappy.html",
-    "iframe": "<iframe src=\"/games/flappy.html\" title=\"Flappy Copter\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/flappy.html",
+    "iframe": "<iframe src=\"./games/flappy.html\" title=\"Flappy Copter\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "minesweeper-retro",
@@ -101,8 +101,8 @@
     "featured": false,
     "icon": "ShieldAlert",
     "accentColor": "#ef4444",
-    "embedUrl": "/games/minesweeper.html",
-    "iframe": "<iframe src=\"/games/minesweeper.html\" title=\"Minesweeper Retro\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/minesweeper.html",
+    "iframe": "<iframe src=\"./games/minesweeper.html\" title=\"Minesweeper Retro\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   },
   {
     "id": "alien-defenders",
@@ -116,7 +116,7 @@
     "featured": true,
     "icon": "Rocket",
     "accentColor": "#ec4899",
-    "embedUrl": "/games/space-invaders.html",
-    "iframe": "<iframe src=\"/games/space-invaders.html\" title=\"Alien Defenders\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
+    "embedUrl": "./games/space-invaders.html",
+    "iframe": "<iframe src=\"./games/space-invaders.html\" title=\"Alien Defenders\" class=\"w-full h-full border-0 rounded-xl\" allowfullscreen sandbox=\"allow-scripts allow-same-origin allow-modals\"></iframe>"
   }
 ]
