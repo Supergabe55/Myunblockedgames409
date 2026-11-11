@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Space Alien Defenders</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #090d16;
+      color: #f1f5f9;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 440px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hud span { color: #38bdf8; }
+    .hud .lives { color: #ef4444; }
+    .canvas-wrap {
+      position: relative;
+      border: 2px solid #1e293b;
+      border-radius: 12px;
+      background: #090d16;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      background: #050811;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 8, 17, 0.88);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .overlay h2 { font-size: 24px; font-weight: 800; color: #f8fafc; }
+    .overlay p { font-size: 13px; color: #94a3b8; }
+    .btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background: #2563eb; }
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+  <div class="hud">
+    <div>SCORE: <span id="score">0</span></div>
+    <div>LIVES: <span class="lives" id="lives">3</span></div>
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="space" width="440" height="400"></canvas>
+    <div id="overlay" class="overlay">
+      <h2 id="ov-title">ALIEN DEFENDERS</h2>
+      <p id="ov-desc">Left/Right or A/D to Move · Space to Fire</p>
+      <button class="btn" id="start-btn">ENGAGE</button>
+    </div>
+  </div>
+
+  <div class="hint">Arrow Keys / A & D · Space to Shoot</div>
+
+  <script>
+    const canvas = document.getElementById('space');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const overlay = document.getElementById('overlay');
+    const ovTitle = document.getElementById('ov-title');
+    const ovDesc = document.getElementById('ov-desc');
+    const startBtn = document.getElementById('start-btn');
+
+    let player = { x: canvas.width / 2 - 15, y: canvas.height - 30, w: 30, h: 14, speed: 4.5 };
+    let lasers = [];
+    let enemyLasers = [];
+    let aliens = [];
+    let alienDir = 1;
+    let alienSpeed = 0.8;
+    let score = 0;
+    let lives = 3;
+    let state = 'MENU';
+    let keys = {};
+    let frame = 0;
+
+    const audioCtx = window.AudioContext ? new (window.AudioContext || window.webkitAudioContext)() : null;
+    function beep(freq, duration = 0.05) {
+      if (!audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function initAliens() {
+      aliens = [];
+      const rows = 4;
+      const cols = 8;
+      const aw = 24;
+      const ah = 18;
+      const padX = 14;
+      const padY = 12;
+      const startX = 35;
+      const startY = 40;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          aliens.push({
+            x: startX + c * (aw + padX),
+            y: startY + r * (ah + padY),
+            w: aw,
+            h: ah,
+            alive: true,
+            color: r === 0 ? '#ef4444' : (r === 1 ? '#f59e0b' : '#10b981')
+          });
+        }
+      }
+    }
+
+    function start() {
+      if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+      player.x = canvas.width / 2 - 15;
+      lasers = [];
+      enemyLasers = [];
+      score = 0;
+      lives = 3;
+      alienDir = 1;
+      alienSpeed = 0.8;
+      scoreEl.textContent = '0';
+      livesEl.textContent = '3';
+      initAliens();
+      state = 'PLAY';
+      overlay.style.display = 'none';
+      requestAnimationFrame(loop);
+    }
+
+    function update() {
+      frame++;
+      // Move player
+      if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.x -= player.speed;
+      if (keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
+      player.x = Math.max(10, Math.min(canvas.width - player.w - 10, player.x));
+
+      // Move player lasers
+      for (let i = lasers.length - 1; i >= 0; i--) {
+        lasers[i].y -= 6.5;
+        if (lasers[i].y < 0) {
+          lasers.splice(i, 1);
+          continue;
+        }
+
+        // Alien collision
+        for (let a of aliens) {
+          if (a.alive && lasers[i] && lasers[i].x >= a.x && lasers[i].x <= a.x + a.w &&
+              lasers[i].y >= a.y && lasers[i].y <= a.y + a.h) {
+            a.alive = false;
+            lasers.splice(i, 1);
+            score += 20;
+            scoreEl.textContent = score;
+            beep(750, 0.08);
+            alienSpeed += 0.03;
+            break;
+          }
+        }
+      }
+
+      // Check alien bounds & step down
+      let hitEdge = false;
+      const living = aliens.filter(a => a.alive);
+      if (living.length === 0) {
+        gameOver(true);
+        return;
+      }
+
+      for (let a of living) {
+        if ((a.x + a.w >= canvas.width - 15 && alienDir > 0) || (a.x <= 15 && alienDir < 0)) {
+          hitEdge = true;
+          break;
+        }
+      }
+
+      if (hitEdge) {
+        alienDir *= -1;
+        for (let a of living) {
+          a.y += 12;
+          if (a.y + a.h >= player.y) {
+            gameOver(false);
+            return;
+          }
+        }
+      } else {
+        for (let a of living) {
+          a.x += alienSpeed * alienDir;
+        }
+      }
+
+      // Enemy fire
+      if (frame % 45 === 0 && living.length > 0) {
+        const shooter = living[Math.floor(Math.random() * living.length)];
+        enemyLasers.push({ x: shooter.x + shooter.w / 2, y: shooter.y + shooter.h });
+      }
+
+      // Move enemy lasers
+      for (let i = enemyLasers.length - 1; i >= 0; i--) {
+        enemyLasers[i].y += 3.5;
+        if (enemyLasers[i].y > canvas.height) {
+          enemyLasers.splice(i, 1);
+          continue;
+        }
+
+        // Hit player
+        const el = enemyLasers[i];
+        if (el.x >= player.x && el.x <= player.x + player.w &&
+            el.y >= player.y && el.y <= player.y + player.h) {
+          enemyLasers.splice(i, 1);
+          lives--;
+          livesEl.textContent = lives;
+          beep(120, 0.25);
+          if (lives <= 0) {
+            gameOver(false);
+            return;
+          }
+        }
+      }
+    }
+
+    function gameOver(won) {
+      state = 'OVER';
+      ovTitle.textContent = won ? 'GALAXY SAVED!' : 'INVASION COMPLETE';
+      ovDesc.textContent = won ? `Incredible pilot! Score: ${score}` : `Final Score: ${score}`;
+      startBtn.textContent = 'PLAY AGAIN';
+      overlay.style.display = 'flex';
+    }
+
+    function draw() {
+      ctx.fillStyle = '#050811';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Starfield
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      for (let i = 0; i < 25; i++) {
+        const sx = (i * 31 + frame * 0.1) % canvas.width;
+        const sy = (i * 19) % canvas.height;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // Aliens
+      aliens.forEach(a => {
+        if (!a.alive) return;
+        ctx.fillStyle = a.color;
+        ctx.beginPath();
+        ctx.roundRect(a.x, a.y, a.w, a.h, 4);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#050811';
+        ctx.fillRect(a.x + 4, a.y + 4, 4, 4);
+        ctx.fillRect(a.x + a.w - 8, a.y + 4, 4, 4);
+      });
+
+      // Player Cannon
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.roundRect(player.x, player.y, player.w, player.h, [4, 4, 0, 0]);
+      ctx.fill();
+      // Barrel
+      ctx.fillRect(player.x + player.w / 2 - 2, player.y - 6, 4, 6);
+
+      // Lasers
+      ctx.fillStyle = '#38bdf8';
+      lasers.forEach(l => {
+        ctx.fillRect(l.x - 1.5, l.y, 3, 10);
+      });
+
+      // Enemy lasers
+      ctx.fillStyle = '#ef4444';
+      enemyLasers.forEach(el => {
+        ctx.fillRect(el.x - 1.5, el.y, 3, 10);
+      });
+    }
+
+    function loop() {
+      if (state !== 'PLAY') return;
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', e => {
+      if (['ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+      keys[e.key] = true;
+
+      if (e.key === ' ') {
+        if (state === 'MENU' || state === 'OVER') {
+          start();
+        } else if (state === 'PLAY' && lasers.length < 3) {
+          lasers.push({ x: player.x + player.w / 2, y: player.y - 6 });
+          beep(600, 0.04);
+        }
+      }
+    });
+
+    window.addEventListener('keyup', e => { keys[e.key] = false; });
+    startBtn.addEventListener('click', start);
+    initAliens();
+    draw();
+  </script>
+</body>
+</html>

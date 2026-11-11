@@ -1,0 +1,6 @@
+{
+  "name": "NovaPlay Unblocked Games",
+  "description": "Fast, sleek unblocked web games portal with an iframe-based JSON catalog, instant play, school stealth tab cloaking, and custom game iframe importer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
